@@ -56,7 +56,29 @@
 \usepackage{algorithmicx}%
 \usepackage{algpseudocode}%
 \usepackage{listings}%
+\usepackage{changepage}
 %%%%
+\usepackage{subcaption}
+\usepackage{xcolor}
+\usepackage{gensymb} % for \textdegree
+\usepackage{tabularx}
+\newcolumntype{Y}{>{\centering\arraybackslash}X}
+\usepackage{amsmath,mathtools,amsthm}
+	\setcounter{MaxMatrixCols}{15}
+\usepackage{array}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{float}
+\usepackage{chngcntr}
+\counterwithin*{equation}{section}
+\usepackage[super]{nth}
+\usepackage{longtable}
+\usepackage{tabularx}
+\usepackage{multirow}
+%\usepackage{multicol}
+\usepackage{adjustbox}
+\usepackage{lipsum}
+\usepackage{makecell}
 
 %%%%%=============================================================================%%%%
 %%%%  Remarks: This template is provided to aid authors with the preparation
@@ -104,19 +126,19 @@ Systematic Review based on R}
 %%  \sfx{IV}}\email{iauthor@gmail.com}
 %%=============================================================%%
 
-\author*[1,2]{\fnm{Polina} \sur{Lemenkova}}\email{pauline.lemenkova@gmail.com}
+\author*[1]{\fnm{Polina} \sur{Lemenkova}}\email{polina.lemenkova2@unibo.it}
+%\author*[1,2]{\fnm{Polina}
+\affil*[1]{\orgdiv{Department of Biological, Geological and Environmental Sciences}, \orgname{Alma Mater Studiorum -- Università di Bologna, }, \orgaddress{\street{Via Irnerio 42}, \city{Bologna}, \postcode{40126}, \state{Emilia-Romagna}, \country{Italy}}}
 
-\affil*[1]{\orgdiv{Department}, \orgname{Organization}, \orgaddress{\street{Street}, \city{City}, \postcode{100190}, \state{State}, \country{Country}}}
-
-\affil[2]{\orgdiv{Department}, \orgname{Organization}, \orgaddress{\street{Street}, \city{City}, \postcode{10587}, \state{State}, \country{Country}}}
+%\affil[2]{\orgdiv{Department}, \orgname{Organization}, \orgaddress{\street{Street}, \city{City}, \postcode{10587}, \state{State}, \country{Country}}}
 
 %%==================================%%
 %% Sample for unstructured abstract %%
 %%==================================%%
 
-\abstract{Text} 
+\abstract{Remote sensing (RS) data provide excellent source of information for Earth observation. Such data are widely used in environmental monitoring and mapping landscape dynamics. The advanced methods of processing RS data, such as Machine Learning (ML), are essential for proper classification of land cover types, and require algorithms of pattern recognition. However, the precise performance of diverse ML algorithms during this process remains unclear for multispectral images. Here we show that the process of multi-step fitting in image analysis drives the predictive modelling of the landscape dynamics depending on the selection of the algorithm. We present the application of four ML algorithms using Geographic Resources Analysis Support System (GRASS) Geographic Information System (GIS): Gaussian Naive Bayes (GND), Decision Tree Classifier (DTC), Linear Discriminant Analysis (LDA) and Support Vector Machine (SVM). We found in supervised classification that SVM has the better capability of pattern recognition with enhanced accuracy and efficiency of image analysis. Time-series satellite Landsat 8-9 OLI/TIRS data spanning spring seasons of 2014–2024 was retrieved from the United States Geological Survey (USGS) platform. The aim is to improve the classification of the RS data processing through multi-step image classification. The methodology includes training, fitting and prediction. The effectiveness of ML algorithms was tested to evaluate their efficiency in classification of a time series of the satellite images using threshold  and multi-step fitting. The results demonstrated landscape dynamics in the coastal and desert areas of Eritrea. The results show that in 2014 the bare land or sparse vegetation class has the largest percentage (15,253 $km^2$ or 42\% of the total), followed by shrubs (8,024 $km^2$ or 21.7\%), herbaceous vegetation (5,268 $km^2$ or 14.8\%) and agricultural crops (1714 $km^2$ or 4.2\%). In 2024, the largest increase for herbaceous vegetation was detected in the area of Semenawi Keih Bahri (> 726.25 $km^2$), while the largest decline category of bare lands with 760 $km^2$. The increase in land cover types was recorded for the classes urban areas built, cultivated agricultural lands, and forests, while shrubs and herbaceous vegetation declined during recent decade.} 
 
-\keywords{Artificial Intelligence, Machine Learning, Deep Learning, Bibliometrix, Bibliometrics, , Scientific metrics,  , H-index, Remote Sensing, GIS, }
+\keywords{Artificial intelligence, machine learning, deep learning, remote sensing, GIS, sustainable development; multistep classification; Africa; GRASS GIS; image analysis}
 
 %%\pacs[JEL Classification]{D8, H51}
 
@@ -124,32 +146,659 @@ Systematic Review based on R}
 
 \maketitle
 
+%----------- section ----------->
 \section{Introduction}\label{sec1}
 
-Text
+\subsection{Background}
+
+Landscape dynamics and climate change have an intertwined nature, and affect the sustainability of the Earth's ecosystems and their inhabitants \cite{Conradi,atmos16040466,Ramachandra}. Given the essential role of landscapes for biodiversity, food security and social well-being, environmental monitoring of land cover changes is one of the most urgent challenges in Earth sciences, and is crucial for meeting the sustainable development goals \cite{Liuetal,Gao,geohazards6030058}. Landscapes in Eastern Africa vary in land cover types and vegetation coverage \cite{Lane,Lemenkova202206,Admas,Lemenkova202220,Jonas,Lemenkova202401,analytics2030040}. Factors that determine such variability are fundamental for land management policy and environmental monitoring. The most essential ones include climate and hydrological parameters which control water, temperature and precipitation, vital for life cycle.
+ 
+Understanding reasons of environmental dynamics in context of land cover development plays a key role for predictive ecosystem modelling. In African countries, notable for highly heterogeneous landscape mosaic, such information can be used by environmental planners and climate analysts to model seasonal environmental rhythms \cite{Reiner2023}. Early detection of landscape dynamics needs a timely recognition of subtle land cover changes and involves data-driven monitoring. This is possible through information extraction from the Remote Sensing (RS) data processed using Geographic Information Systems (GIS), as reported in relevant studies \cite{w17182744,Gui,jimaging11080249,w17152317,Lemenkova202501}. Such methods enable quantifying land cover changes over short-term or long-term frames.
+
+Nonlinear aspects of landscape dynamics and impact factors of land cover changes often remain hidden information. Extracting this information from satellite images is a challenge in eco-informatics which requires multi-step fitting and predictive analysis. Main issues are related to geo-information retrieval include RS data processing. Such techniques focus on image classification and interpretation of pixels for thematic mapping. Effective RS data analysis enables to detect landscape patterns \cite{asi6040061,Lemenkova20234964} or map geologic features \cite{DEFFO2024e26319,NWAILA202271,MONO2024135,ASGHEDE2025101722}. When applied to image analysis, GIS methods aims at finding the best solution for extracting geo-information through multi-step fitting. Hence, algorithms of image analysis aim at increase of precision and automation of the workflow. Such advancements are beneficial for analysis of landscape dynamics since they increase accuracy of mapping, forecasting and predictive modelling.
+
+Nevertheless, there are still issues in image analysis related to workflow automation. These include, for instance, misclassified pixels, similar spectral reflectance values, ambiguous interpretation, and more. To solve this problems, Machine Learning (ML) presents effective supplementary advanced tools to image processing through algorithms of supervised ensemble learning \cite{plants14182841}. Such methods are especially effective for scale-fitted data analysis with growing area including the use of Artificial Intelligence (AI) to automatically recognise objects on the images. The existing applications include both multispectral \cite{Lemenkova20253769,horticulturae11091073} and hyperspectral images \cite{rs17173126,horticulturae11091077} processed for environmental analysis. Other examples include mapping using Light Detection and Ranging (LiDAR) data for monitoring natural and man-made ecosystems, including land areas \cite{s25164991,rs17152733}, forests \cite{f16091381,rs17173011}, and coastal zones \cite{rs17162912}. In this study, we consider these approaches and present the case of ML algorithms for image analysis in GIS aimed at environmental monitoring of the spatially constrained region in East Africa.
+
+\subsection{Motivation}
+
+Univocal, consistent and reproducible approaches of cartographic data processing is an unresolved topic in ecology and environmental mapping. Progress towards accurate explanatory environmental modelling using combination of Machine
+Learning (ML) techniques and RS data is limited in the coverage of similar GIS-based research for ecosystem modelling. With this regards, automation in GIS methods supports rapid and accurate data processing for spatially constrained regions. Specifically, Artificial Intelligence (AI)-driven cartography offers novel methods in geospatial tasks through training, evaluating and deploying ML models \cite{jmse12081279,Vahidnia02012019,Chenetal2023}. Over the course of recent decades, the development of programming algorithms and ML has challenged the GIS community to employ these analytical instruments for RS domain and cartographic data processing \cite{rs17122070,rs17162917}. 
+
+Examples of ML include Deep Learning (DL), Convolutional Neural Networks (CNN) and Machine Learning (ML) techniques include robust algorithms of classification, such as RF, SVM, Naive Bayes, Gradient boosting, to mention a few. Application of such methods enhances the precision of object recognition on the image through advanced level of pixel analysis. Hence, AI significantly facilitates the workflow of image processing through process optimization: the increase of the speed and precision of data processing. As a result, the application of such methods improves the quality of image analysis.
+
+Selected of the currently known ML methods in cartography should be briefly mentioned: Pyramid scene parsing network (PSPNet) \cite{ijgi12010014}, DeepLabV3 (PyTorch) \cite{rs17183145}, UNet \cite{rs14020358}, TensorFlow and Keras libraries of Python \cite{rs11232881}, Segment Anything Model (SAM) Meta-AI \cite{rs16091505}, DL algorithms \cite{w16081141}, or TensorBoard toolkit in ArcGIS Deep Learning Studio with Application Programming Interface (API) for Python by arcis.learn module. Such methods enable to perform image analysis workflow, including semantic segmentation, feature extraction, pattern recognition and supervised classification.
+
+For environmental monitoring, the application of ML presents high perspectives since it presents automated framework to detection and robust attribution of land cover changes \cite{6069282,10170600,Lemenkova20201734,8526926}. As a result, rapidly developing advanced methods are now actively adopted in environmental analysis. To mention a few of them: multi-criteria analysis \cite{w17081212}, Monte Carlo simulating \cite{app15126575,w12071913,w16162302}, integer linear programming \cite{buildings14010213}, thresholding in image analysis \cite{AFJAL2019514}, combinatorial optimization of graph convolution network \cite{ijgi11050270}, adaptive neuro-fuzzy inference \cite{ijgi10060382,Pradhan2019}, solutions for optimization \cite{land12091786,Lemenkova202312,su16135660}, spatial interaction with predefined functional centres \cite{Kim03032016,urbansci5010007}, and many more examples of simulated modelling. Using such methods, it is possible to detect changes in land cover types on satellite scenes.
+
+\subsection{Objectives and goals}
+
+The study goal is to monitor the environmental changes in landscapes of Eritrea, East Africa. To achieve this goal, the general objective is to {quantify land cover changes detected on the satellite images. Specific objective is to evaluate the effectiveness of the ML methods of image processing through selected optimal algorithm in GRASS GIS \cite{grass_development_team_2025_14918754}. 
+ 
+ \subsection{Research questions}
+ 
+{Land cover change affects the domains of vegetation, plant diversity, habitat heterogenety, agriculture and environmental sustainability. Nevertheless, many questions remain unanswered. In this study we aim at answering the following research questions:}  
+\begin{enumerate}
+	\item Did landscape dynamics increase in eastern Eritrea in recent decade ?
+	\item How did these changes affect landscape mosaics in the time span of 2014-2024 ?
+	\item Did natural ecosystems gain compared to artificial surfaces and bare lands ?
+\end{enumerate}
+Answering these questions is crucial for understanding the applicability of landscape dynamics to other mountain areas of East Africa. To this end, we aim at resolving the technical tasks of RS data processing using ML:
+\begin{itemize}
+	\item Selecting optimal classification algorithm (LDA, SVM, DTC and GND);
+	\item Properly exploiting the spectral-temporal information in the time series;
+	\item Evaluating landscape variability over large areas with heterogeneous mosaic.
+\end{itemize}
+
+\section{Geographical context}
+
+The study area encompasses coastal and desert {ecosystems} of Eritrea around the Massawa Channel and includes the Semenawi Bahri National Park stretching along the west coasts of the Red Sea, Figure \ref{fig01}.
+
+\begin{figure}[H]
+\captionsetup{position=bottom,justification=centering} 
+\begin{subfigure}[]{.55\textwidth}
+		\centering
+			\includegraphics[width=6.5cm]{Fig_01a.jpg}
+		\caption{}
+	\end{subfigure}
+	\begin{subfigure}[]{.45\textwidth}
+		\centering
+			\includegraphics[width=6.5cm]{Fig_01b.jpg}
+		\caption{}
+	\end{subfigure}
+\caption{{Map of Eritrea with location of the study area (red rotated square indicating the position of the Landsat images). \textbf{(a)}: Aerial photo from Google Earth. \textbf{(b)}: Terrain map. Source: Google Maps.}}\label{fig01}
+\end{figure}
+
+ {The history of land cover/land use in Africa has been
+reported in previous studies} \cite{MARCHANT2018322,DUBE2023129738,ALI2024113123,CHARDON2025105187}. {During recent decades, the landscapes in Eastern Africa have changed significantly due to the cumulative effects of land use patterns dynamics and climate change} \cite{HATEGEKIMANA2025100936,YEBOAH2025107680,YHDEGO2025105412}. {Anthropogenic factors affect landscapes and reshaped land cover patterns in this region, since they are strongly related to social-economic development. The major problem of the developing African countries, such as Eritrea, consists in the migration of the local population to the cities which leads to the land abandonment}.
+
+{The} landscapes of Eritrea are highly diverse since {the country} is located at the intersection of the main climate zones of Africa: tropical savannah, desert, and temperate. {Therefore}, Eritrea has a variety of habitats, such as tropical and subtropical grasslands, shrubland, xeric vegetation, and moist broadleaf and evergreen forests on the slopes of mountains, {Figure} \ref{fig02}. Among them, three main types of vegetation include riverine forests, acacia woodlands, and highland xeric shrubs. Savannah has recently encroached on semi-natural grasslands in highlands and plateaus because of the climate change and human activities. The latter include nomadic activities and excessive land use {which lead to recent} environmental challenges, such as desertification and landscape dynamics. These processes are reflected in land cover changes and habitat fragmentation visible on the satellite images.
+
+\begin{figure}[H]
+\hspace{50pt}\makebox[0.90\linewidth][r]{%
+	\begin{subfigure}[b]{.40\textwidth}
+		\centering
+			\includegraphics[height=3.5cm]{Fig_02a.jpg}
+		\caption{}
+	\end{subfigure}%
+	\begin{subfigure}[b]{.40\textwidth}
+		\centering
+		\includegraphics[height=3.5cm]{Fig_02b.jpg}
+		\caption{}
+	\end{subfigure}%
+	\begin{subfigure}[b]{.40\textwidth}
+		\centering
+		\includegraphics[height=3.5cm]{Fig_02c.jpg}
+		\caption{}
+	\end{subfigure}%
+}\\
+\vfill \vspace{1mm}
+\hspace{50pt}\makebox[0.90\linewidth][r]{%
+	\begin{subfigure}[b]{.40\textwidth}
+		\centering
+			\includegraphics[height=3.5cm]{Fig_02d.jpg}
+		\caption{}
+	\end{subfigure}%
+	\begin{subfigure}[b]{.40\textwidth}
+		\centering
+		\includegraphics[height=3.5cm]{Fig_02e.jpg}
+		\caption{}
+	\end{subfigure}%
+	\begin{subfigure}[b]{.40\textwidth}
+		\centering
+		\includegraphics[height=3.5cm]{Fig_02f.jpg}
+		\caption{}
+	\end{subfigure}%
+}\\
+\vfill \vspace{1mm}
+\hspace{50pt}\makebox[0.90\linewidth][r]{%
+	\begin{subfigure}[b]{.40\textwidth}
+		\centering
+			\includegraphics[height=3.5cm]{Fig_02g.jpg}
+		\caption{}
+	\end{subfigure}%
+	\begin{subfigure}[b]{.40\textwidth}
+		\centering
+		\includegraphics[height=3.5cm]{Fig_02h.jpg}
+		\caption{}
+	\end{subfigure}%
+	\begin{subfigure}[b]{.40\textwidth}
+		\centering
+		\includegraphics[height=3.5cm]{Fig_02i.jpg}
+		\caption{}
+	\end{subfigure}%
+}
+\caption{Landscapes of Eritrea with major land cover types: \textbf{(a)} Herbaceous vegetation;  \textbf{(b)} Shrubland;  \textbf{(c)} Agriculture crops;  \textbf{(d)} Bare lands;  \textbf{(e)} Urban areas;  \textbf{(f)} Wetlands;  \textbf{(g)} Semi-deciduous evergreen forest;  \textbf{(h)} Deciduous broadleaf forest;  \textbf{(i)} Sparse vegetation. Source: Unsplash Public Domain Images}\label{fig02}
+\end{figure}
+
+{In recent decades, Eritrea underwent a process of polarisation in the land use. On the one hand, lowlands and coastal areas experienced an expansion of bare or sparsely vegetated areas, and an intensification of shrubs or herbaceous vegetation to 43\%} \cite{Adem}, {often with the loss of the last remnants of cultivated lands and croplands due to the land abandonment. On the other hand, the country experienced drastic urban growth which is a typical trend for Sub-Saharan and Sahel African region} \cite{SUN2024141443,SULEMANA2019101544}{. Specifically, urban population of Eritrea increased from 17.6\% to 40.1\% in recent 30 years} \cite{Esmail}. {Such social-economic pressures induced a decline in rural population, and lead to the abandonment of marginal lands. At the same time, the country includes precious biodiversity hotspots and fertile soil valuable for agriculture and food security, which is threatened by desertification} \cite{VALE202057,ANGULOPRECKLER2024e03339}. Geologic setting of Eritrea {affected the development of landscapes and control the distribution of land cover types. The geology of Eritrea creates }high potential for mineral exploration and rich prospects for geothermal energy resources \cite{Fuetal2021,min15080851}. Regional{ }set up consists of Precambrian basement rocks overlain by Mesozoic, Tertiary to Quaternary periods \cite{Khan}, Figure \ref{fig03}.
+
+\begin{figure}[H]
+\begin{subfigure}{\textwidth}
+   \caption{}
+    \centering
+    	\includegraphics[width=0.85\textwidth]{Fig_03a.jpg}
+\end{subfigure}
+\begin{subfigure}{\textwidth}
+ \caption{}
+    \centering
+    	\includegraphics[width=0.85\textwidth]{Fig_03b.jpg}
+\end{subfigure}
+\caption{{Geologic setting of Eritrea according to United States Geological Survey (USGS). \textbf{(a)}: Geological provinces, distribution of major units and structure blocks in Eritrea. \textbf{(b)}: Surface lithology of Eritrea. Data: USGS. Software: QGIS v. 3.34 Prizren. Map source: author.}}
+\label{fig03}
+\end{figure}
+
+{Typical} landforms of Eritrea are related to the {mountainous geomorphology} which as formed by constant uplift at high rate and faulting during the Cenozoic era \cite{Bosworthetal2005}. Crustal deformations largely control the orientation and density of the main fluvial systems, affect the upstream and geomorphometric features (curvature and steepness) \cite{Abbate}. As a result{,} physiographic feature of Eritrea consists in its highly rugged relief {that reflects the tectonic uplifting in the past}: deeply incised river network and steep bedrock of a valley \cite{Billi2022b}. 
+
+Large terranes are structurally and lithologically distinct and constitute the Neoproterozoic of Eritrea shaping its current geomorphology \cite{Markwick,Vanmaercke}. Close location to the tectonically active region of East African Rift with high magmatism associated with Cenozoic flood basalts in the Afar Triangle creates high seismicity \cite{Hammond}. {The country is located on} three major geological provinces:
+ \begin{enumerate}
+ 	\item Western and northern regions cross the South Red Sea Shield with dominating highlands. The geometry of the Red Sea rift is shaped by the combination of the extensional stress field and lithospheric structures \cite{Issachar}. Tertiary faults activated shear zones in the Pan-African basement and caused active mantle processes in crustal basement \cite{Ebinger,Sembroni}.  
+	 \item Eastern and south-eastern regions{ }are situated within the Amhara Plateau which continues central highland plateau of Ethiopia, and coastal regions of the Red Sea Basin. Active seismicity and volcanism in the past affected its modern relief \cite{HamielBaer}.
+	 \item Southern part{ }continues the Afar Triple Junction with Danakil Depression. {It is }formed as a result of geologic-tectonic and climate factors. Here, the fork in the rift where three tectonic plates are diverging in the Horn of Africa results in high seismicity and active regional volcanism \cite{Illsley,Lemenkova202205}.  
+ \end{enumerate}
+
+{Such contrasting }geomorphic {landforms} in arid{ }desert climate {have} a strong influence on the {hydrogeological setting} and environmental patterns. These are expressed in the extent of the geologic lineaments, distribution of shield basalts and{ }hot springs. {The} areas of high groundwater potential are typical for basaltic layers located over the crystalline rocks. Such zones have flat topography, dense pattern of{ }structurally controlled{ }channels that enable water drainage in valleys and support vegetation growth. In contrast, Danakil Depression consists of sedimentary rocks (sandstone and limestone) overlain by basalts originating from lava flows during past volcanism.
+
+%----------- section ----------->
+\section{Materials and Methods}
+
+%----------- subsection ----------->
+\subsection{Workflow}
+
+{The research methodology is based on several working steps that include RS data collection, import and processing, environmental analysis, scripting in GRASS GIS and geo-information extraction for cartographic visualization}. {The graphical schematic workflow is presented in the scheme in Figure} \ref{fig04}. 
+
+This software was selected due to its effectiveness, {flexibility} and functionality: it processes diverse data format, supports complex functionality of image processing and imports the results into the bitmap data format{. }The embedded algorithms of GRASS GIS modules for image processing enable to perform accurate training of the models using scripting approaches \cite{Lemenkova202505}. The AI-driven {ML} framework of image processing described below was employed to map seasonal variations in the Eritrea using satellite multispectral Landsat 8-9 OLI/TIRS images with repetitive time span. The performance of the both AI-driven and MaxLike methods of image classification was visualised, compared and evaluated with 30-m resolution multi-spectral Landsat OLI-TIRS multispectral images with the results shown as colour classified images. 
+
+The methodology of processing the RS data employs Python's libraries of Scikit-Learn with algorithms of supervised classification such as SVM, LDA, DTC, GND, Figure \ref{figworkflow}. These algorithms were compared among each other and with those obtained from the traditional approach of Maximal Distance Discriminant Analysis that uses unsupervised classification approach. The best results were demonstrated by the SVM which indicated detailed classification in mapping.
+
+\begin{figure}[H]
+	\includegraphics[width=13.0cm]{Fig_04.jpg}
+    \caption{Graphical workflow of the methodological process. Source: author.}
+    \label{fig04}
+\end{figure}
+
+\subsection{Data}
+
+The{ }data were collected from the United States Geological Survey (USGS) {EarthExplorer repository} as a time series {of the multispectral satellite images Landsat 8-9 OLI/TIRS} on {the month of March in }years 2014, 2018, 2022 and 2024{, Figure} \ref{fig05}. {The quality of data makes it possible to exploit the synergy of the multi-temporal time series.} The {data} contained seven multispectral Landsat bands for each image (Aerosol, Blue, Green, Red, NIR, SWIR-1, SWIR-2){.} 
+
+{Colour} composites of the images {are based on the} following multispectral bands{: }3-4-5; 1-5-6; 1-4-6; 5-4-3. Band designations for Landsat -8 OLI/TIRS sensor used for this visualization: 1- Coastal aerosol; 3 – Green; 4 – Red; 5 – Near Infrared – NIR; 6 – Shortwave Infrared (SWIR)-1. Common characteristics of the are the following: Datum and ellipsoid are WGS84, Product Map Projection UTM Zone 37. Sensor Identifier is OLI\_TIRS, Landsat Satellite 8, Collection Category T1, Number 2. The images were taken at day time at nadir, with quality taken at scale 9 with Ground Control Points (GCP) Version 5, Station Identifier LGN, WRS path 169, row 49. Metadata and key technical characteristics of the images{ }are summarised in the Appendix \ref{AppA}. {The choice of these data is explained by the reputable history of Landsat, free availability and quality. }Geospatial data are important source {of information }for analysis of landscape dynamics {and environmental mapping}\cite{5383529,Lemenkova202212,5653756,Lemenkova202125}. {RS }data enables to model biodiversity changes{ using time series analysis} \cite{Feigl,Pangtey2025,Singh2025}. 
+
+{Various studies on land cover mapping are carried out with satellite data, e.g., SPOT-4, WorldView, Landsat. Examples of the Landsat include the cases of environmental monitoring of Africa} \cite{BHAGA2023101037,FEYISA201423}. {This study employs the Landsat-8-9 OLI/TIRS images, whose characteristics are similar to those of Sentinel-2. Despite the difference in resolution (30 m for multi-spectral bands of Landsat, 10 m for visible and Near Infra-Red (NIR) bands for Sentinel, both sensors share common important geometric features of performing acquisitions at constant angles. Thus, the scenes are observed with the same solar and acquisition angles, which is important geometric specifics. Directional effects, which cause significant variations in the reflectances measured by the sensors, are thus limited.} 
+
+The land cover data were obtained from the Food and Agriculture Organization (FAO) (\href{https://data.apps.fao.org/catalog/iso/c1f0e345-8ef1-45a2-a0b3-13e183bf13ff}{https://data.apps.fao.org/catalog/iso/c1f0e345-8ef1-45a2-a0b3-13e183bf13ff}) using the GlobeCover dataset. {Since} original {data} depicts the land cover in globe scale, it was downscaled to the {target extent}. The topographic data and a shaded relief background{ }were collected from the General Bathymetric Chart of the Oceans (GEBCO): \href{https://www.gebco.net}{https://www.gebco.net}. The topographic map was plotted in {Generic Mapping Toolset} (GMT) \cite{Wessel} using existing methods of cartographic scripts \cite{geosciences12030140}.  
+
+\begin{figure}[H]
+    \begin{center}
+	\hspace{-25pt}\includegraphics[width=12.0cm]{Fig_05.jpg}
+    \end{center}
+    \caption{False and natural color composites of the triple bands of Landsat 8 OLI/TIRS images covering study area in Eritrea. {Data} source: Landsat archived obtained from the EarthExplorer repository, USGS. Compilation: author.}
+    \label{fig05}
+\end{figure}
+
+%----------- subsection ----------->
+\subsection{Image processing}
+
+ Image processing and classification has been performed using console-based techniques of GRASS GIS software \cite{NETELER2012124}. {Several algorithms of ML} methods were {executed for image processing workflow, Figure} \ref{fig06}. ML models employ computer vision, enabling to {discriminate patches in} highly heterogeneous mosaics of vegetation{. }Such approach {analyses} spectral reflectance of diverse land cover types {and detects} patterns of pixels with similar values. {The} results of this iterative process enable to {categorise the objects on the} images and {extract}information{.} 
+ 
+ {The} operational workflow{ }includes {several steps summarised in Figure} \ref{fig06}. {First, image enhancement was applied to improve image quality, decrease cloudiness and improve the contrast. The procedure of cloud masking is included: this was done using the i.landsat.acca modules which automatically detect clouds based on the Automatic Cloud Cover Assessment (ACCA) algorithm. Afterwards, the atmospheric correction was performed using landsat.toar and reflectance calibration which removed the path radiance. As a result, preprocessing data enabled to get surface reflectance through performing atmospheric correction.}
+ 
+{The module i.landsat.toar was used to highlight features essential for recognition land cover types. }The images were classified into raster maps with automatically detected categories of land cover types. The approach was implemented by using a set of modules{, }including {the} non-supervised classification used as training dataset of random pixel seeds.{ The data} were imported {using} model 'r.import' {and} multispectral bands were grouped using g.region. {Here}, the functions 'extent' and 'resolution' define spatial borders and spectral resolution of the input data.{ }Different colour {composites were created to }show a highly diverse texture of land cover types. {The unsupervised automatic classification for generating training polygons was performed through the 'i.cluster' module. Its algorithm generated spectral signatures for different land cover types. In particular, it recognised and identified the spectral reflectance values of the pixels.} Statistical characteristics on initial image properties for four scenes are summarised in Table \ref{tab01}. 
+
+\begin{figure}[H]
+    \begin{center}
+	\hspace{-0.0cm}\includegraphics[width=14.0cm]{Fig_06.jpg}
+    \end{center}
+    \caption{Schematic approach of image processing and data analysis in GRASS GIS. Source: author.}
+    \label{fig06}
+\end{figure}
+
+\begin{table}[h]
+\caption{Initial means and standard deviations for 7 multispectral bands of 4 Landsat-8 OLI/TIRS images covering Eritrea on 30 March 2014, 25 March 2018, 4 March 2022 and 9 March 2024}\label{tab1}%
+\begin{tabular}{@{}lllllllll@{}}
+\toprule
+{Year} & {Stat} & {Band 1} & {Band 2} & {Band 3} & {Band 4} & {Band 5} & {Band 6} & {Band 7}\\
+\midrule
+\multirow{ 2}{*}{2014} & Means & 9162.01 & 9860.14 & 11384.9 & 12259.4 & 13715.7 & 15723.4 & 14815 \\
+    & St. Dev. & 1665.86 & 1904.88 & 2890.35 & 4024.82 & 5046.8 & 6495.05 & 5919.18 \\
+    \midrule
+    \multirow{ 2}{*}{2018} &  Means & 9154.1 & 9938.56 & 11577.5 & 12482.2 & 13883 & 15826.9 & 14922.7 \\
+    & St. Dev. & 1797.38 & 1923.61 & 2703.44 & 3791.01 & 4719.46 & 6077.47 & 5511.82 \\
+    \midrule
+    \multirow{ 2}{*}{2022} &  Means & 8899.43 & 9658.08 & 11188.3 & 11874.6 & 13591.5 & 15141.3 & 14002.1 \\
+    & St. Dev. & 1634.65 & 1801.18 & 2557.68 & 3574.09 & 4676.77 & 5836.53 & 5099.32 \\
+    \midrule
+    \multirow{ 2}{*}{2024} &  Means & 8785.91 & 9433.87 & 10727.5 & 11383.4 & 13271.2 & 14787 & 13712.2 \\
+    & St. Dev. & 1453.00 & 1651.73 & 2503.25 & 3468.44 & 4725.69 & 5879.95 & 5185.96 \\
+\botrule
+\end{tabular}
+\end{table}
+
+The results of data handling are saved for each image. The signature file was used as input for 'i.maxlik' to generate an unsupervised image classification using information  in signature file. The maximum-likelihood classifier uses the cluster means and covariance matrices obtained from the signature file generated by the 'i.cluster'. Here, the algorithms defines to which category based on the definition of spectral class belongs each cell in the satellite image. This partition is done based on the evaluation of the probability of belonging of each cell to the classes (here, the example for the image on 2024, repeated for each year).The classification model of GRASS GIS is defined by the module 'i.maxlik' which performs image partition using a maximum-likelihood discriminant analysis classifier{.} 
+
+\subsection{Machine learning}
+
+{To enrich the functionality of GIS, the ML solutions were used through algorithms of Gaussian Naive Bayes (GND), Decision Tree Classifier (DTC), Linear Discriminant Analysis (LDA) and Support Vector Machine (SVM). }The ML classifiers were used to detect {land} cover types {on the} images.{ }Unlike the existing methods of image classification, ML considers the differences among the spectral reflectance of pixels when modelling topology of patches. {Besides, } ML {analyses} texture and spectral features to measure the similarity of {neighbour} patches {while} generating random decision trees.{ }All{ }models were trained {through} randomly selected points from the test image.{ }The technical approach employs $n\_estimators$ parameter in every ML model, included in the syntax of the code. Here, the number of estimators parameter is derived from Scikit-Learn library of Python and affects only tree-based estimators{. }In this context, it specifies the number of separate decision trees trained on various subsets of observations{.} The data were trained using the function $training\_map$ in the 'r.learn.train' module{.} The fitted { }estimator was applied to rasters using 'r.learn.predict'{.}  The {ML algorithms were} evaluated for performance with the categories checked using the 'r.category' module{ to evaluate the overfitting through several cycles of reassessment.}
+
+\begin{itemize}
+\item {The} pixels were evaluated and assigned using the r.learn.predict {which predicts} the {assignment} of pixels to land cover classes.
+\item {The} training pixels were employed to perform a classification on the recent images using the {r.learn.train}.
+\item Raster categories were automatically applied to the{ }output and assessed using ‘r.category’.
+\end{itemize}
+
+The same procedure was completed for all the maps and visualised for GNB approach of ML. The key approach of the GNB as a ML classification technique consists in an assumption that supposes that each land cover class follows a normal distribution. It presumes that each parameter of vegetation reflectance has an independent capacity of predicting the output variable. This is advantageous for homogeneous classes. However, for landscapes of Eritrea, the input data are heterogeneous and selected classes (xeric vegetation in semi-desert areas and mangroves along the coasts of the Red Sea, mosaic grasslands and shrubland) do not contain such normal distribution and have regional distribution patterns.
+
+\subsubsection{Algorithm: Linear Discriminant Analysis (LDA)}
+
+The major approach of the LDA algorithm is that it solves the multi-class classification problem in highly diversified patterns of landscape with repetitive mosaics. It separates multiple classes which have diverse several features by reducing the data dimensionality. {The mathematic foundation for the case of LDA with more than two classes is presented in the Equation} \ref{eq01}:
+
+\begin{equation}\label{eq01}
+	\Sigma _{b}={\frac {1}{C}}\sum _{i=1}^{C}(\mu _{i}-\mu )(\mu _{i}-\mu )^{\mathrm {T}}
+\end{equation}
+
+{Here, the assumption is that every C class has the same covariance $\Sigma$ and a mean of the categories $\mu _{i}$. The sample covariance of the means of each land cover class is then used to define the scatter between class variability. Such principle approach increases the precision of the separability between the classes.} The main feature of the LDA consists in the optimization of the ML models for image processing through partition of classes that represent land cover types \cite{rs17050854}. 
+
+ \subsubsection{Algorithm: Support Vector Machine (SVM)}
+ 
+{The Support Vector Machine (SVM) algorithm has been effectively applied in remote sensing. The goal of SVM is to find the best borders between the classes by fitting the separating values in high dimensions. The SVM is a group of linked learning algorithms, and can be applied both for classification and regression tasks. Originally developed by} \cite{VapnikChervonenkis}, {the SVM becomes a robust non-parametric classifier widely used in many cases on image analysis} \cite{earth5030024,rs16122250,rs16122219}. {The process of SVM is based on training the data with linearly separable classes which determines the quality of its performance. Its mathematical implementation consists is described in the Equation} \ref{eq02}:
+
+\begin{equation}\label{eq02}
+	\left[{\frac {1}{n}}\sum _{i=1}^{n}\max \left(0,1-y_{i}(\mathbf {w} ^{\mathsf {T}}\mathbf {x} _{i}-b)\right)\right]+\lambda \|\mathbf {w} \|^{2}
+\end{equation}
+ 
+{where $(\mathbf {x} _{1},y_{1}),\ldots ,(\mathbf {x} _{n},y_{n})$ signify the training image dataset of $n$ pixels that form raster matrix of cells, ${w}$  is the normal vector perpendicular to the linear hyperplane, which indicates the discriminating direction of the plane, and a scalar $b$, which indicates the discriminating hyperplane's offset from the origin, necessary for separation of the land cover classes The majority of the natural land cover classes obey the soft-margin classifier, hence, a small value for $\lambda $ results in the hard-margin classifier for satellite images with medium resolution, such as Landsat. Such feature of the SVM is suitable for image classification in heterogeneous landscapes with nonlinear borders between land cover classes.}
+
+\subsubsection{Algorithm: Decision Tree Classification (DTC)}}
+  
+{Decision Tree Classification (DTC) algorithm is among the most widely used categorization models due to their interpretability and applications in remote sensing} \cite{Miao,Buthelezi,Meyer}. {Based on the recursive partitioning of the dataset, it becomes the efficient and scalable learning algorithm for image classification. The DTC method iteratively divides the dataset as the entity of pixels on the raster image according to their characteristics -- Digital Numbers (DN), representing spectral reflectance. This iterative partition minimizes the impurity of the classified dataset, using biodiversity index of Gini impurity which indicates feature importance score} \cite{rs16101659}. {Branches produced in this procedure to represent attribute values of the land cover categories according to the spectral reflectance. The key mathematical foundation of this method is the following. The probability of miscategorizing the pixel on the raster image is defined in Equation }\ref{eq03}:
+
+\begin{equation}\label{eq03}
+	\sum_{k\neq{i}} p_{k} = 1 - p_{i}
+\end{equation}
+
+{where $p_i$ is the probability of choosing a pixel with label $i$ on the raster image $ i\in \{1,2,...,J\}$ which should be categorised into the correct class. Here, the set of pixels comprise the image with $J$ classes and relative frequencies $p_{i}$ for each pixel indicating cell on the raster scene. For each label of land cover class, the pairwise products of these probabilities are added up to determine the Gini impurity as in Equation }\ref{eq04}:
+
+ \begin{equation}\label{eq04}
+	I_{G}(p)=\sum_{i=1}^{J}\Biggl(p_i\sum_{k\neq{i}} p_k\Biggr) = \sum_{i=1}^{J} p_i(1-p_i) = \sum_{i=1}^{J} (p_i - p_{i}^2) = \sum_{i=1}^{J} p_i - \sum_{i=1}^{J} p_{i}^2 = 1 - \sum_{i=1}^{J} p_{i}^2
+\end{equation}
+
+{The algorithm of the DTC includes four key components :} 
+\begin{enumerate}
+	\item {Root Nodes show the starting points of the tree before dividing the image into classes} 
+	\item {Decision Nodes representing the points of the branches which go from these nodes}
+	\item {Branches that connect nodes and show paths  of the results of the tests}
+	\item {Leaf Nodes signifying the final nodes of the decision tree as class labels}
+\end{enumerate}
+{The depth of the trees is controlled by the parameters of minimum number of leaf node observations and maximal number of decision splits. In this case we chosen four for the depth of the DTC. The decision nodes are selected according to the attributes, i.e., class features of the pixels showing spectral reflectance values of the land cover types.}
+
+\subsubsection{Algorithm: Gaussian Naive Bayes (GNB)}
+   
+{Theoretically, the Gaussian Naive Bayes (GNB) uses a conditional probability model through assigned probabilities $p(C_{k}\mid x_{1},\ldots ,x_{n})$ for each of the $K$ possible results or classes $C$ on the classified satellite image as $C_{k}$ where pixels representing the scene of the images are described as vector $ \mathbf {x} =(x_{1},\ldots ,x_{n})$ in Equation} \ref{eq05}:
+
+\begin{equation}\label{eq05}
+	p(C_k \mid x) = \frac{p(C_{k})p(x \mid C_{k}))}{p(x)}
+\end{equation}
+
+{The ML algorithm GNB is based on Gaussian distribution and employs probabilistic techniques. Its mathematical foundation is the Bayes theorem which presumes that features are conditionally independent. Hence, each variable of the pixel of the image representing spectral reflectance of the Earth's objects follows a normal distribution. The algorithm determines the likelihood that an unknown pixel falls into the given category of land cover class by computing the mean and variance of the spectral reflectances in each category of land cover class} \cite{rs16122168,Lietal2022,Madhu}. {In this way, the algorithm partitions the  mosaic of land cover classes into spatial pattern of categories with distinct values. Since the majority of the land cover features on the image have roughly normal distributions, the GNB model can be applied to image processing with acceptable justification.}
+
+\subsection{Cartographic visualization}
+ 
+Cartographic visualization was performed using{ }frameworks of GRASS GIS at different temporal scales for thematic maps by combining {several modules}.{ }The following steps repeated the visualization of the obtained maps and adding cartographic details (legend, grid). { }The use of{ }modules {for} visualization (r.colors, d.legend, d.rast, g.region) is commented in previous works with examples provided for {code snippets} \cite{land12111995}. Different colour palettes were applied for visualising{ }of various ML models (byr for LDA, roygbiv for GNB and SVM, plasma for DTC){ to distinguish} the results and {compare the} maps. Using the selected palette for all the maps was supported by the legends where the same set of classes is {described} in classification according to the designated classes.
+
+\subsection{Accuracy assessment}
+
+The{ computed }raster map displays the reject threshold{ }based on the \emph{chi}-square test computed for each discriminant result at various{ }levels of confidence, Figure \ref{fig06}. {It indicates the} rejection probability of pixels classification and assignment to {categories}. The {classification} accuracy{ }was improved with each iteration during the repetitive cycle of computing. Depending on the complexity of patterns in land categories, the{ }process{ }was completed in{ }8 to 10 cycles, Table \ref{tab:Iter} in the Appendix \ref{AppC}. Additionally, class separability matrices were computed for processed images on years 2014, 2018, 2022 and 2024{, }Appendix \ref{AppD}. The {separability matrices} determine the confidence level at which each cell in the raster mosaic of the{ }image is classified correctly. The reject threshold map layer has the index to one calculated confidence level for each classified pixel in the scenes. 
 
 \section{Results}\label{sec2}
 
+\subsection{Land cover changes: spatio-temporal dynamics in 2014-2024}
 
-\subsection{Results}
+{By analysing the satellite images, variations in land cover types were quantified in the target region of Eritrea. The results of the classification demonstrated landscape dynamics in the coastal and central regions of Eritrea which proved the existing issues of land degradation and local desertification in central regions. The maps in Figure} \ref{fig07} {show large spatial heterogeneity which indicates the evolution of urban and vegetation areas in the assessed short-term period between 2014 to 2024.} The results obtained from image classification show variations in 10 land cover change in south-eastern Eritrea and along the coasts of the Red Sea: 1) Herbaceous vegetation; 2) Shrubs; 3) Agriculture crops; 4) Bare lands; 5) Urban areas; 6) Water; 7) Wetlands; 8) Forest (deciduous broadleaf); 9) Forest (semi-deciduous evergreen); 10) Sparse vegetation. The series of {the processed }Landsat{ }satellite images{ }illustrated { landscape dynamics in }Eritrea in {the} period {from }2014 to 2024. {The dominant role in these processes plays climate processes such as} precipitation and evapotranspiration partitioning which {affected vegetation growth}. 
 
-\subsection{Descriptive Analysis}\label{subsec2}
+\begin{figure}[H]
+\hspace{50pt}\makebox[0.90\linewidth][r]{%
+	\begin{subfigure}[b]{.35\textwidth}
+		\centering
+		\includegraphics[height=3.5cm]{Fig_07a.jpg}
+		\caption{}
+	\end{subfigure}%
+	\begin{subfigure}[b]{.28\textwidth}
+		\centering
+		\includegraphics[height=3.5cm]{Fig_07b.jpg}
+		\caption{}
+	\end{subfigure}%
+	\begin{subfigure}[b]{.27\textwidth}
+		\centering
+		\includegraphics[height=3.5cm]{Fig_07c.jpg}
+		\caption{}
+	\end{subfigure}%
+	\begin{subfigure}[b]{.27\textwidth}
+		\centering
+		\includegraphics[height=3.5cm]{Fig_07d.jpg}
+		\caption{}
+	\end{subfigure}%
+}\\
+\vfill \vspace{1mm}
+\hspace{50pt}\makebox[0.90\linewidth][r]{%
+	\begin{subfigure}[b]{.35\textwidth}
+		\centering
+		\includegraphics[height=3.5cm]{Fig_07e.jpg}
+		\caption{}
+	\end{subfigure}%
+	\begin{subfigure}[b]{.28\textwidth}
+		\centering
+		\includegraphics[height=3.5cm]{Fig_07f.jpg}
+		\caption{}
+	\end{subfigure}%
+	\begin{subfigure}[b]{.28\textwidth}
+		\centering
+		\includegraphics[height=3.5cm]{Fig_07g.jpg}
+		\caption{}
+	\end{subfigure}%
+	\begin{subfigure}[b]{.28\textwidth}
+		\centering
+		\includegraphics[height=3.5cm]{Fig_07h.jpg}
+		\caption{}
+	\end{subfigure}%
+}
+\caption{{Results of unsupervised image classification using MaxLike approach. Background shaded relief: GEBCO grid: \textbf{(a)} 2014; \textbf{(b)} 2018;  \textbf{(c)} 2022;  \textbf{(d)} 2024. Accuracy assessment through rejection probability and chi-test: \textbf{(e)} 2014;  \textbf{(f)} 2018;  \textbf{(g)} 2022;  \textbf{(h)} 2024}}\label{fig07}
+\end{figure}
 
-\subsubsection{TITLE}\label{subsubsec2}
+The efficiency of environmental mapping that operate with the satellite images for monitoring seasonal fluctuations in land cover types can now be improved by using the ML methods of Python integrated with cartographic tools{. }The processes of the environmental changes are notable in the coastal areas due to the distribution of wetland ecosystems, Figure \ref{fig08}. Here, plant transpiration {and evapotranspiration of soil are} lower compared to the {grasslands} in{ }central regions{ which affects water balance and control vegetation growth. Besides, raised temperature caused reduced throughfall in a mixed type of land cover and as well as lower rain precipitation events in central Eritrea. Consequently, the reduced discharge reduces volume of water in soil horizon which leads to desertification. Hence, detected} changes in vegetation reflect the climate-hydrological dynamics, {such as} dry soil and lack of humidity {which }play a major role in controlling vegetation cycle, which is{ }notable in hydrological balance{.}  
 
-Text
+{Three land cover classes showing the greatest changes are Class 1) Herbaceous vegetation (increase); Class 4) Bare/sparse vegetation (decrease) and Class 10) Sparse vegetation. This is highlighted in Table} \ref{tab03}, {which reports the dynamics in land cover change  between 2014 and 2024. The computational processing of RS data enabled to reveal the direction of the environmental processes with gain (increase) and losses (decrease) in land cover classes. In this way, the percentage of categories occupied by different land cover classes was compared for the period from 2014 to 2024 for grasslands, bare lands and shrubland in central plateau, wetlands along the coastline of the Red Sea.} 
 
-\section{TITLE}\label{sec4}
+\begin{table}[h]
+\caption{Variations in pixel values by 10 land cover classes in Eritrea in 2014, 2018, 2022 and 2024}\label{tab03}%
+\begin{tabular}{@{}lllllllllll@{}}
+  \toprule
+   Year & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 \\
+   \midrule
+    2014 & 2438 & 178 & 71 & 184 & 351 & 568 & 729 & 930 & 789 & 771 \\
+    2018 & 1914 & 650 & 66 & 170 & 330 & 578 & 768 & 862 & 908 & 748 \\
+    2022 & 2388 & 206 & 125 & 316 & 184 & 544 & 798 & 828 & 808 & 808 \\
+    2024 & 2490 & 119 & 198 & 145 & 364 & 497 & 708 & 909 & 844 & 827 \\
+    \botrule
+\end{tabular}
+\end{table}
 
+{The results show that in 2014 the bare land or sparse vegetation class has the largest percentage (15,253 $km^2$ or 42\% of the total), followed by shrubs (8,024 $km^2$ or 21.7\%), herbaceous vegetation (5,268 $km^2$ or 14.8\%) and agricultural crops (1714 $km^2$ or 4.2\%). The comparative analysis of the time series through the ML-based analysis shown that in 2024 the largest increase for Class 2 (herbaceous vegetation) was detected in the area of Semenawi Keih Bahri (> 726.25 $km^2$), while the largest decline was recorded in the Class 4 (category of bare lands) with 760 $km^2$ and Class 10 (category of sparse vegetation) with 307 $km^2$. The obtained results approve previously reported changes in land cover types of Eritrea with dynamics of sparse vegetation, grassland, and cropland covers} \cite{rs11060724}. 
+
+\begin{figure}[H]
+\hspace{50pt}\makebox[0.90\linewidth][r]{%
+	\begin{subfigure}[b]{.35\textwidth}
+		\centering
+		\includegraphics[height=3.5cm]{Fig_08a.jpg}
+		\caption{}
+	\end{subfigure}%
+	\begin{subfigure}[b]{.28\textwidth}
+		\centering
+		\includegraphics[height=3.5cm]{Fig_08b.jpg}
+		\caption{}
+	\end{subfigure}%
+	\begin{subfigure}[b]{.27\textwidth}
+		\centering
+		\includegraphics[height=3.5cm]{Fig_08c.jpg}
+		\caption{}
+	\end{subfigure}%
+	\begin{subfigure}[b]{.27\textwidth}
+		\centering
+		\includegraphics[height=3.5cm]{Fig_08d.jpg}
+		\caption{}
+	\end{subfigure}%
+}\\
+\vfill \vspace{1mm}
+\hspace{55pt}\makebox[0.90\linewidth][r]{%
+	\begin{subfigure}[b]{.35\textwidth}
+		\centering
+		\includegraphics[height=3.5cm]{Fig_08e.jpg}
+		\caption{}
+	\end{subfigure}%
+	\begin{subfigure}[b]{.28\textwidth}
+		\centering
+		\includegraphics[height=3.5cm]{Fig_08f.jpg}
+		\caption{}
+	\end{subfigure}%
+	\begin{subfigure}[b]{.28\textwidth}
+		\centering
+		\includegraphics[height=3.5cm]{Fig_08g.jpg}
+		\caption{}
+	\end{subfigure}%
+	\begin{subfigure}[b]{.28\textwidth}
+		\centering
+		\includegraphics[height=3.5cm]{Fig_08h.jpg}
+		\caption{}
+	\end{subfigure}%
+}
+\caption{{ML-based supervised image classification using DTC algorithm. Background shaded relief: GEBCO grid: \textbf{(a)} 2014; \textbf{(b)} 2018;  \textbf{(c)} 2022;  \textbf{(d)} 2024. ML-based supervised image classification using LDA algorithm \textbf{(e)} 2014;  \textbf{(f)} 2018;  \textbf{(g)} 2022;  \textbf{(h)} 2024}}\label{fig08}
+\end{figure}
+
+%%%%%%%TABLE
+
+Time series analysis enable to perform environmental monitoring and detect {fluctuations in} droughts {that are reflected in vegetation cycles} in the ecosystems of {Eritrea}. Thus, the comparison of satellite scenes indicated that landscapes of Eritrea undergo intense changes related to climate issues, such as desertification and aridification. In recent ten evaluated years, the landscape has changed significantly due to the gradual development in salinization of the coastal Eritrea. Such processes are related to the hydrological cycle including evaporation of water during dry periods which coincides with the cycle of flooding and evaporation in the coastal Eritrea. Dry period reaches its peak in summer, while the most water-filled period is in March. {Detected issues of }landscape dynamics{ indicated impact factors that affected vegetation. These included climate processes (temperature and precipitation) and social activities (abandoned lands, agriculture, urban growth, land use patterns)}.  
+
+{The detected land cover changes are related to the climate issues and social-economic factors. The first one includes the natural processes of water evaporation in drying desert landscapes. The latter includes urban dynamics, standardisation and simplification of land use practices, and abandonment of pastures. Such processes trigger expansion of desert and bare lands, which results in habitat homogenization. Together with low-productivity in the agricultural fields, this contributed to the decrease in landscape diversity.}
+
+%---------------------- subsection -------------------------->
+\subsection{Algorithm performance: Comparison of the ML approaches}
+
+Comparing the used ML algorithms for cartographic processing, the LDA demonstrates the fastest processing speed when dealing with multi-spectral images using functions of RS modules, 'r.learn.predict' and 'r.category'. When solving complex hybrid functions of 'r.learn.train' module, this algorithm shows excellent exploration of the previous training dataset used as seed for the following classification. The extensibility of LDA is represented in optimising the training pixels derived from the generated dataset by 'r.random' module with different heterogeneity of the landscapes that is expressed in fragmentation of patches. Besides superior performance, the time complexity of LDA when used in GRASS GIS is acceptable compared with 'MaxLike' approach using 'i.maxlik' module as a traditional variant of image classification.
+
+\begin{figure}[H]
+\hspace{50pt}\makebox[0.90\linewidth][r]{%
+	\begin{subfigure}[b]{.35\textwidth}
+		\centering
+		\includegraphics[height=3.5cm]{Fig_09a.jpg}
+		\caption{}
+	\end{subfigure}%
+	\begin{subfigure}[b]{.28\textwidth}
+		\centering
+		\includegraphics[height=3.5cm]{Fig_09b.jpg}
+		\caption{}
+	\end{subfigure}%
+	\begin{subfigure}[b]{.27\textwidth}
+		\centering
+		\includegraphics[height=3.5cm]{Fig_09c.jpg}
+		\caption{}
+	\end{subfigure}%
+	\begin{subfigure}[b]{.27\textwidth}
+		\centering
+		\includegraphics[height=3.5cm]{Fig_09d.jpg}
+		\caption{}
+	\end{subfigure}%
+}\\
+\vfill \vspace{1mm}
+\hspace{55pt}\makebox[0.90\linewidth][r]{%
+	\begin{subfigure}[b]{.35\textwidth}
+		\centering
+		\includegraphics[height=3.5cm]{Fig_09e.jpg}
+		\caption{}
+	\end{subfigure}%
+	\begin{subfigure}[b]{.28\textwidth}
+		\centering
+		\includegraphics[height=3.5cm]{Fig_09f.jpg}
+		\caption{}
+	\end{subfigure}%
+	\begin{subfigure}[b]{.28\textwidth}
+		\centering
+		\includegraphics[height=3.5cm]{Fig_09g.jpg}
+		\caption{}
+	\end{subfigure}%
+	\begin{subfigure}[b]{.28\textwidth}
+		\centering
+		\includegraphics[height=3.5cm]{Fig_09h.jpg}
+		\caption{}
+	\end{subfigure}%
+}
+\caption{{ML-based supervised image classification using SVM algorithm. Background shaded relief: GEBCO grid: \textbf{(a)} 2014; \textbf{(b)} 2018;  \textbf{(c)} 2022;  \textbf{(d)} 2024. ML-based supervised image classification using GNB algorithm \textbf{(e)} 2014;  \textbf{(f)} 2018;  \textbf{(g)} 2022;  \textbf{(h)} 2024}}\label{fig09}
+\end{figure}
+
+The initial results of the statistical data for 10 classes received after the maximum-likelihood discriminant analysis of seven spectral bands are presented in Appendix \ref{AppB} with the following tables: Initial means for multispectral bands of Landsat image covering Eritrea on 30 March 2014, Table \ref{tabA01}, image on 25 March 2018 - in Table \ref{tabA02}, image on 4 March 2022 - in Table \ref{tabA03}, and image on 9 March 2024 - in Table \ref{tabA04}. After cycles of iterations (Appendix \ref{AppC}), the results on computed class means for each of the 7 multispectral classes and four years are evaluated. The results of the classification approaches for all images were evaluated by generating error matrices and running Kappa analysis to statistically determine the accuracy of the land cover maps{, Figure} \ref{fig10}. 
+
+The results of experiments demonstrate the following outcome of the ML methods. The computational results indicate that the SVM algorithm of the is dominant in comparison with other methods. Compared to the clustering algorithm of unsupervised classification, SVM algorithm achieved the best performance in classification of the satellite images. The parameter values of the SVM showed that most regions were identified correctly except for the occasional segments in the landscapes of central Eritrea, Figure \ref{fig09}. SVM outperformed the other approaches due to the following main reasons indicating its effectiveness: 
+
+\begin{itemize}
+\item First, the algorithm is highly effective for high dimensionality data such as RS characterised by the heterogeneous mosaics of landscapes, as in case of Eritrea. 
+\item Second, due to kernel function, SVM is suitable to solve complex problems of pattern recognition in constrained landscapes with diversified environmental patches. 
+\item Third, compared to the other ML and {Artificial Neural Network (ANN)} approaches, SVM is less prone to overfitting which results in accurately classified scenes of the multispectral imagery. 
+\end{itemize}
+
+
+\begin{figure}[H]
+\captionsetup{position=bottom,justification=centering} 
+\begin{subfigure}[]{.55\textwidth}
+	\caption{}\vspace{2pt}
+		\centering
+			\includegraphics[width=6.5cm]{Fig_10a.jpg}
+	\end{subfigure}
+	\begin{subfigure}[]{.45\textwidth}
+	\caption{}\vspace{2pt}
+		\centering
+			\includegraphics[width=6.0cm]{Fig_10b.jpg}
+	\end{subfigure}
+\caption{{Statistical evaluation of the algorithm performance: \textbf{(a)}: Cohen's Kappa agreement coefficient. \textbf{(b)}: F-1 Score of Predictive Performance. Graph source: author. Software: R version 4.5.1}}\label{fig10}
+\end{figure}
+
+Among the tested methods, the SVM approach demonstrated the best performance in terms of balanced speed of processing and detailed categorization of vegetation types. The SVM {demonstrated} high automation in image processing, accuracy in pixel assignments, increased details of classification with more fragmented identified patterns in the landscapes of eastern Eritrea. The detected landscape dynamics enabled to demonstrate the robustness of the AI-based classification to monitoring seasonal variations using RS data. 
+
+The drawbacks of the DTC for image processing include the instability to changes and noise in the dataset (even low cloudiness might affect the output). Besides, the algorithm is based on complex calculations and is computationally expensive with need for computer memory and resources which is demanding for large datasets and limited computer memory. Finally, the classified categories are unbalanced as the algorithm is non-continuous. The LDA{ }is sensitive to outliers which means that selected patches of landscapes can be ignored. Besides, the LDA might miss local geometric information in highly rugged landscape patches with irregular shapes of the polygons which limits its robustness and efficiency in such cases and complex mosaics of landscape patches. The LDA algorithm has the problem of the small sample size while training the data, which affects its performance in practical issues of satellite image classification.
+
+
+%----------- section ----------->
+\section{Discussion}
+{In this study, the short-term series of the multispectral satellite data Landsat were classified to detect changes in land cover types of Eritrea in 10-year period of 2014-2024. Specifically, we }evaluated the GRASS GIS modules for ecological applications and mapping land cover types. Current study contributed to the development of advanced ML-based methods of image analysis for environmental monitoring and mapping. Specifically, we evaluated the use of ML for cartographic mapping using Landsat in the target area of Eritrea. {This} approach performs well for environment monitoring using satellite imagery with the best {results} demonstrated by SVM. Comparing {with} similar studies, diverse research projects have demonstrated the potential of the this approach to image processing{.} 
+
+{Compared to the ML methods, the structure of CNN consists of convolutional layers that employ filters to extract features on the images, as objects on the Earth's surface. Activation layers - Rectified Linear Unit (ReLU) introduce nonlinearity in the model structure through reduced dimensionality. Fully connectivity between the layers enables to perform classification which explains the smooth performance of these methods. }
+
+{The novelty and relevance of this study relates to the two main aspects:} 
+\begin{enumerate} 
+	\item {It benchmarks the ecosystem-level processes of land cover changes in a ML-based experimental way, therefore providing evidence of the challenges and opportunities of applying the ML algorithms in other regions of Africa. }
+	\item {It brings clear innovation potential in interdisciplinary methodological approach. By merging GIS mapping, RS, statistical data extraction and ML approach, this study tackles complex environmental problems of landscape dynamics in Eritrea.}
+\end{enumerate} 
+{Hence, the demonstrated interdisciplinary approach creates a multi-facetted understanding of the drivers shaping land cover diversity patterns in the context of spatio-temporal trends.}
+
+%----------- section ----------->
 \section{Conclusion}\label{sec13}
 
-Text
+{Despite the existing applications of ML in image analysis, there is still} lack of a practical framework and hands-on environmental applications {for African studies. The environmental dynamics }needs to be better exploited in view of the{ vulnerability of the landscapes to cumulative effects from climate, human activities and geologic setting}. Hence, this study demonstrated the {contribution to the environmental analysis of East African region showing the }benefits of ML {in image analysis}. The examples of the supervised training in ML approaches {were applied to image analysis} with a case of the {land cover} mapping of Eritrea{from 2014 to 2024}. The research evaluated ML algorithms of image classification for improved workflow of image processing and tested their applicability in cartographic works.{. }Maps generated from the processed {Landsat 8-9 OLI/TIRS} satellite images demonstrated {landscape dynamics in 10-year period}.  Landscape dynamics includes a complexity of both human-induced and climate-related processes. Landscape dynamics is triggered by a consequence of the expansion of forest area and the habitat homogenization {which can be detected using approach of eco-environmental informatics} \cite{Yue2025}. 
+
+Time series analysis of spaceborne data enables to compare current and previous state of the landscapes and highlight landscape dynamics using cartographic data analysis. Such visualization can be used for crop monitoring \cite{OUATTARA2025104783,LIEPA2024101230}, assessment of landscape sustainability \cite{6573358,Demichelis} and prognosis of {the environmental} development \cite{Subramani,Sprigg2025}. In this work, the supervised {classification} of { images} were {compared} to map landscape dynamics using various ML {algorithms}. These include the important characteristics of RS data processing, such as speed and accuracy, randomness of nodes, analytical determination of the output weights, and dependence distribution of pixels for each algorithm. Though each{ }algorithm was developed to serve different objectives of{ }RS data processing, their technical implementation and practical purposes present valuable approaches to{ }image analysis. 
+
+The{ }applications {of ML algorithms }can be effectively used for environmental monitoring and mapping \cite{Ezugwu}. {Thus, ML-based RS data processing has seen a significant increase in ecological research on sustainable development and strategic land planning. Natural hazards including droughts, desertification and deforestation, can be identified using RS data to support appropriate decisions. Locations of threats can be identified using geospatial cartographic data processing which presents great importance geoinformatics. ML has been accepted as a robust novel approach to finding solutions to satellite image processing. }When using ML approach, the automation of geospatial data processing increases according to the choice of diverse ML instruments \cite{Basu}. 
+
+Moreover, the feasibility of the ML algorithms enables to use it as an innovative approach that may be used in practice for diverse types of satellite images. Here we demonstrated that the outcome of the framework in the GRASS GIS based image processing using ML is the output of the series of the classified satellite images covering central Italy processed using decision criteria analysis of ML algorithms. The particular case of this work presented an example of the ML modules to process the multispectral Landsat images for environmental mapping of Eritrea. Several algorithms of ML were tested and compared for visualization of landscapes using image partition into land cover classes automatically. To enhance its application in similar future studies, the ML classifiers technique can be applies as effective tools of GRASS GIS to processing Earth observation data for operative environmental monitoring.
+
+\paragraph{Abbreviations}
+
+\begin{tabular}{@{}ll}
+AI & Artificial Intelligence \\
+{ACCA} & {Automatic Cloud Cover Assessment} \\ 
+{API} & {Application Programming Interface} \\
+{ANN} & {Artificial Neural Network} \\
+{CNN} & {Convolutional Neural Networks} \\ 
+DTC & Decision Tree Classifier \\
+FAO & Food and Agriculture Organization \\ 
+GEBCO & General Bathymetric Chart of the Oceans \\
+RS & Remote Sensing \\
+GMT & Generic Mapping Tools \\
+GNB & Gaussian Naive Bayes \\
+GRASS & Geographic Resources Analysis Support System \\
+GIS & Geographic Information System \\
+Landsat OLI/TIRS & Landsat Operational Land Imager and Thermal Infrared Sensor \\
+LDA & Linear Discriminant Analysis \\
+ML & Machine Learning \\
+NIR & Near Infrared \\
+{PSPNet} & {Pyramid scene parsing network} \\
+{SAM} & {Segment Anything Model} \\
+SWIR & Shortwave Infrared \\
+SVM & Support Vector Machine \\
+USGS & United States Geological Survey \\
+\end{tabular}
 
 \backmatter
 
 \section*{Declarations}
 
 The author declares no conflict of interest
+
+%----------- section ----------->
+\section{Appendix}\label{sec14}
+
+\subsection{Metadata for the Landsat 8-9 OLI/TIRS images obtained from the USGS}\label{AppA}
+
+\subsection{Class separability matrices between land cover types}\label{AppD}
+
+%----------- matrix ----------->
+%\begin{adjustwidth}{-\extralength}{0cm}
+\begin{equation}
+\scriptsize
+\begin{vmatrix}
+   & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 \\
+1 & 0 &  &  &  &  &  &  &  &  &  \\
+2 & 1.2 & 0 &  &  &  &  &  &  &  &  \\
+3 & 2.4 & 1.5 & 0 &  &  &  &  &  &  &  \\
+4 & 3.8 & 2.5 & 0.8 & 0 &  &  &  &  &  &  \\
+5 & 5.1 & 3.4 & 1.5 & 0.8 & 0 &  &  &  &  &  \\
+6 & 6.0 & 4.1 & 2.2 & 1.5 & 0.8 & 0 &  &  &  &  \\  
+7 & 6.9 & 4.8 & 2.8 & 2.1 & 1.5 & 0.7 & 0 &  &  &  \\  
+8 & 7.4 & 5.3 & 3.4 & 2.8 & 2.2 & 1.5 & 0.8 & 0 &  &  \\
+9 & 7.8 & 5.8 & 3.9 & 3.5 & 3.0 & 2.3 & 1.7 & 0.9 & 0 &  \\   
+10 & 8.7 & 6.7 & 4.7 & 4.4 & 3.9 & 3.3 & 2.7 & 1.9 & 1.0 & 0 \\        
+\end{vmatrix}
+ %
+\hspace{3pt}
+\begin{vmatrix}
+    & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 \\
+1 & 0 &  &  &  &  &  &  &  &  &  \\
+2 & 1.2 & 0 &  &  &  &  &  &  &  &  \\
+3 & 2.5 & 1.5 & 0 &  &  &  &  &  &  &  \\
+4 & 2.8 & 1.9 & 2.1 & 0 &  &  &  &  &  &  \\
+5 & 4.6 & 3.5 & 2.8 & 0.9 & 0 &  &  &  &  &  \\
+6 & 5.6 & 4.5 & 3.2 & 1.6 & 0.8 & 0 &  &  &  &  \\  
+7 & 6.5 & 5.5 & 3.8 & 2.3 & 1.6 & 0.8 & 0 &  &  &  \\  
+8 & 7.6 & 6.6 & 4.5 & 3.0 & 2.4 & 1.6 & 0.8 & 0 &  &  \\
+9 & 7.5 & 6.6 & 4.7 & 3.5 & 3.0 & 2.3 & 1.6 & 0.9 & 0 &  \\   
+10 & 8.4 & 7.5 & 5.3 & 4.4 & 4.0 & 3.4 & 2.7 & 2.0 & 1.1 & 0 \\                
+\end{vmatrix} 
+\end{equation}
+%\end{adjustwidth}
+
+Class separability matrices between 10 land cover types in Eritrea: 2014 and 2018.
+
+%----------- matrix ----------->
+%\begin{adjustwidth}{-\extralength}{0cm}
+\begin{equation}
+\scriptsize
+\begin{vmatrix}
+   & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 \\
+1 & 0 &  &  &  &  &  &  &  &  &  \\
+2 & 1.2 & 0 &  &  &  &  &  &  &  &  \\
+3 & 2.3 & 1.9 & 0 &  &  &  &  &  &  &  \\
+4 & 4.0 & 2.7 & 1.0 & 0 &  &  &  &  &  &  \\
+5 & 3.3 & 2.4 & 1.1 & 0.8 & 0 &  &  &  &  &  \\
+6 & 5.1 & 3.5 & 1.9 & 0.9 & 1.1 & 0 &  &  &  &  \\  
+7 & 5.8 & 4.2 & 2.5 & 1.6 & 1.4 & 0.8 & 0 &  &  &  \\  
+8 & 6.5 & 4.8 & 3.2 & 2.3 & 2.0 & 1.5 & 0.8 & 0 &  &  \\
+9 & 7.3 & 5.6 & 4.0 & 3.2 & 2.6 & 2.4 & 1.7 & 0.9 & 0 &  \\   
+10 & 8.8 & 6.8 & 5.2 & 4.4 & 3.7 & 3.6 & 2.9 & 2.0 & 1.1 & 0 \\          
+\end{vmatrix}
+ %
+\hspace{3pt}
+\begin{vmatrix}
+    & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 \\
+1 & 0 &  &  &  &  &  &  &  &  &  \\
+2 & 1.3 & 0 &  &  &  &  &  &  &  &  \\
+3 & 2.7 & 2.3 & 0 &  &  &  &  &  &  &  \\
+4 & 3.6 & 3.1 & 0.9 & 0 &  &  &  &  &  &  \\
+5 & 4.4 & 3.2 & 1.0 & 1.0 & 0 &  &  &  &  &  \\
+6 & 5.5 & 3.8 & 1.8 & 1.7 & 0.9 & 0 &  &  &  &  \\  
+7 & 5.8 & 4.2 & 2.3 & 2.0 & 1.5 & 0.7 & 0 &  &  &  \\  
+8 & 6.6 & 4.8 & 3.0 & 2.7 & 2.3 & 1.6 & 0.8 & 0 &  &  \\
+9 & 7.5 & 5.6 & 3.8 & 3.5 & 3.2 & 2.5 & 1.7 & 0.9 & 0 &  \\   
+10 & 8.0 & 6.1 & 4.6 & 4.2 & 4.1 & 3.4 & 2.6 & 1.9 & 1.0 & 0 \\                   
+\end{vmatrix} 
+\end{equation}
+%\end{adjustwidth}
+
+Class separability matrices between 10 land cover types in Eritrea: 2022 and 2024.
 
 \bibliography{AIEnhanced}% common bib file
 %% if required, the content of .bbl file can be included here once bbl is generated
